@@ -1,33 +1,39 @@
 """Default pipeline."""
+import logging
 from collections.abc import Iterator
 from functools import partial
-import logging
 from pathlib import Path
 from tempfile import gettempdir
 from typing import TYPE_CHECKING, final
 
+import torch
+import wandb
 from jaxtyping import Float, Int
 from lightning import Trainer
 from lightning.pytorch.loggers import WandbLogger
 from pydantic import NonNegativeInt, PositiveInt, validate_call
-import torch
 from torch import Tensor
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 from transformer_lens import HookedTransformer
-import wandb
 
-from sparse_autoencoder.activation_store.tensor_store import TensorActivationStore
+from sparse_autoencoder.activation_store.tensor_store import \
+    TensorActivationStore
 from sparse_autoencoder.autoencoder.lightning import LitSparseAutoencoder
-from sparse_autoencoder.metrics.validate.reconstruction_score import ReconstructionScoreMetric
-from sparse_autoencoder.metrics.wrappers.classwise import ClasswiseWrapperWithMean
-from sparse_autoencoder.source_data.abstract_dataset import SourceDataset, TorchTokenizedPrompts
-from sparse_autoencoder.source_model.replace_activations_hook import replace_activations_hook
-from sparse_autoencoder.source_model.store_activations_hook import store_activations_hook
+from sparse_autoencoder.metrics.validate.reconstruction_score import \
+    ReconstructionScoreMetric
+from sparse_autoencoder.metrics.wrappers.classwise import \
+    ClasswiseWrapperWithMean
+from sparse_autoencoder.source_data.abstract_dataset import (
+    SourceDataset, TorchTokenizedPrompts)
+from sparse_autoencoder.source_model.replace_activations_hook import \
+    replace_activations_hook
+from sparse_autoencoder.source_model.store_activations_hook import \
+    store_activations_hook
 from sparse_autoencoder.source_model.zero_ablate_hook import zero_ablate_hook
 from sparse_autoencoder.train.utils.get_model_device import get_model_device
-from sparse_autoencoder.utils.data_parallel import DataParallelWithModelAttributes
-
+from sparse_autoencoder.utils.data_parallel import \
+    DataParallelWithModelAttributes
 
 if TYPE_CHECKING:
     from sparse_autoencoder.tensor_types import Axis
@@ -327,8 +333,8 @@ class Pipeline:
         name: str = f"{self.run_name}_{'final' if is_final else self.total_activations_trained_on}"
 
         # Wandb
-        if wandb.run is not None:
-            self.autoencoder.sparse_autoencoder.save_to_wandb(name)
+        # if wandb.run is not None:
+        #     self.autoencoder.sparse_autoencoder.save_to_wandb(name)
 
         # Local
         local_path = self.checkpoint_directory / f"{name}.pt"
